@@ -27,37 +27,45 @@ append (x:xs) ys = x : (append xs ys)
 
 elementAt :: Int -> [Int] -> Int
 elementAt 0 (x:_) = x
-elementAt _ []     = error "index greater than length"
+elementAt n xs
+    | n >= (length xs) = error "index too large" 
+    | n < 0           = error "negative index"
+elementAt _ [] = error "index greater than length"
 elementAt n (_:xs) = elementAt (n - 1) xs
-
 
 null :: [Int] -> Bool
 null [] = True
 null _  = False
 
 length :: [Int] -> Int
-length = undefined
+length [] = 0
+length (_:xs) = 1 + (length xs)
 
 
 take :: Int -> [Int] -> [Int]
 take _ [] = []
-take 1 (x:xs) = [x]
+take 1 (x:_) = [x]
 take n _ | n < 1 = []
 take n (x:xs) = x : take (n-1) xs
 
 take' :: Int -> [Int] -> [Int]
 take' 0 _  = []
-take' n [] = [] 
+take' _ [] = [] 
 take' n (x:xs) | n < 0     = []
                | otherwise = x : take' (n-1) xs
 
 
 drop :: Int -> [Int] -> [Int]
-drop = undefined
+drop _ [] = []
+drop n xs | n < 0  = xs
+          | n == 0 = xs
+drop n (_:xs) = drop (n-1) xs
 
 
 elem :: Int -> [Int] -> Bool
-elem = undefined
+elem _ [] = False
+elem n (x:xs) | n == x = True
+              | otherwise = elem n xs
 
 
 reverseHelper :: [Int] -> [Int] -> [Int]
@@ -76,40 +84,62 @@ reverseString :: String -> String
 reverseString str = "This is the reversed string: " ++ (reverseStringHelper [] str)
 
 concat :: [[Int]] -> [Int]
-concat = undefined
+concat [] = []
+concat (x:xs) = append x (concat xs)
 
 
 replicate :: Int -> Int -> [Int]
-replicate = undefined
+replicate n x | n <= 0 = []
+              | otherwise = x : replicate (n-1) x
 
 
 interleave :: [Int] -> [Int] -> [Int]
-interleave = undefined
+interleave [] _ = []
+interleave (x:_) [] = [x]
+interleave (x:xs) (y:ys) = x : y : interleave xs ys
 
 
 sum :: [Int] -> Int
-sum = undefined
+sum [] = 0
+sum (x:xs) = x + sum xs
 
+
+maxHelper :: Int -> [Int] -> Int
+maxHelper acc [] = acc
+maxHelper acc (x:xs) | acc < x = maxHelper x xs
+                     | otherwise = maxHelper acc xs
 
 maximum :: [Int] -> Int
-maximum = undefined
-
+maximum [] = error "empty list"
+maximum (x:xs) = maxHelper x xs
 
 nub :: [Int] -> [Int]
-nub = undefined
+nub [] = []
+nub (x:xs) | elem x xs = nub xs
+           | otherwise = x : nub xs 
 
 
 delete :: Int -> [Int] -> [Int]
-delete = undefined
+delete _ [] = []
+delete n (x:xs) 
+    | x == n = xs
+    | otherwise = x : delete n xs
 
 
 difference :: [Int] -> [Int] -> [Int]
-difference = undefined
+difference [] _ = []
+difference (x:xs) ys
+    | elem x ys = difference xs (delete x ys)
+    | otherwise = x : difference xs ys
 
 
 union :: [Int] -> [Int] -> [Int]
-union = undefined
+union xs ys = append xs (difference (nub ys) xs)
 
 
 intersect :: [Int] -> [Int] -> [Int]
-intersect = undefined
+intersect [] _ = []
+intersect (x:xs) ys
+    | elem x ys = x : intersect xs ys
+    | otherwise = intersect xs ys
+

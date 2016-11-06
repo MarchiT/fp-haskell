@@ -26,19 +26,19 @@ clear   = 0
 -- Exercise 1
 
 getLastDigit :: Int -> Int
-getLastDigit x = mod x 10 
+getLastDigit num = mod num 10
 
 
 dropLastDigit :: Int -> Int
-dropLastDigit x = quot x 10 
+dropLastDigit num = quot num 10
 
 
 -- Exercise 2
 
 getReverseDigits :: Int -> [Int]
-getReverseDigits x | x < 10    = [x]
+getReverseDigits x | x < 0  = getReverseDigits (-x)
+                   | x < 10 = [x]
                    | otherwise = getLastDigit x : getReverseDigits (dropLastDigit x)
-
 
 -- Exercise 3
 
@@ -55,15 +55,15 @@ toChar 8 = '8'
 toChar 9 = '9'
 toChar _ = error "Not a digit"
 
-
 -- Exercise 4
 
 itoaLoop :: String -> [Int] -> String
-itoaLoop acc []     = acc
+itoaLoop acc [] = acc
 itoaLoop acc (x:xs) = itoaLoop (toChar x : acc) xs
 
+
 itoa :: Int -> String
-itoa num = itoaLoop [] (getReverseDigits num) 
+itoa x = itoaLoop "" (getReverseDigits x)
 
 
 -- Exercise 5
@@ -85,8 +85,19 @@ getStyle "blu" = mkTextStyle blue
 getStyle "mgt" = mkTextStyle magenta
 getStyle "cyn" = mkTextStyle cyan
 getStyle "wht" = mkTextStyle white
+
+getStyle "bgr-blk" = mkBackgroundStyle black
+getStyle "bgr-red" = mkBackgroundStyle red
+getStyle "bgr-grn" = mkBackgroundStyle green
+getStyle "bgr-ylw" = mkBackgroundStyle yellow
+getStyle "bgr-blu" = mkBackgroundStyle blue
+getStyle "bgr-mgt" = mkBackgroundStyle magenta
+getStyle "bgr-cyn" = mkBackgroundStyle cyan
+getStyle "bgr-wht" = mkBackgroundStyle white
+
 getStyle "clr" = mkStyle clear
-getStyle xs    = "<" ++ xs ++ ">"
+getStyle xs = "<" ++ xs ++ ">"
+
 
 -- Exercise 6
 
@@ -101,26 +112,26 @@ bleach []            = []
 
 
 colorize :: String -> String
-colorize ('<':x:y:z:'>':rest) = getStyle [x, y, z] ++ colorize rest
-colorize (x:xs)               = x : colorize xs
-colorize []                   = []
-
+colorize ('<':x:y:z:'>':rest) = getStyle [x,y,z] ++ colorize rest
+colorize (x:xs)              = x : colorize xs
+colorize []                  = []
 
 -- Extra
 
 mkBackgroundStyle :: Int -> String
-mkBackgroundStyle = undefined
+mkBackgroundStyle color = mkStyle (color + backgroundStyle)
 
-
+--takeWhile
 getMarkup :: String -> String
-getMarkup = undefined
-
+getMarkup text = (takeWhile (/= '>') text)
 
 dropMarkup :: String -> String
-dropMarkup = undefined
+dropMarkup text = drop 1 (dropWhile (/= '>') text)
 
 
 -- What bug does `colorize2` have? It's good that we know it, but we won't fix it now
 
 colorize2 :: String -> String
-colorize2 = undefined
+colorize2 ('<':rest) = getStyle (getMarkup rest) ++ colorize2 (dropMarkup rest)
+colorize2 (x:xs)     = x : colorize2 xs
+colorize2 [] = []
