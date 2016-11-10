@@ -27,9 +27,8 @@ append (x:xs) ys = x : (append xs ys)
 
 elementAt :: Int -> [Int] -> Int
 elementAt 0 (x:_) = x
-elementAt n xs
-    | n >= (length xs) = error "index too large" 
-    | n < 0           = error "negative index"
+elementAt n _
+    | n < 0 = error "negative index"
 elementAt _ [] = error "index greater than length"
 elementAt n (_:xs) = elementAt (n - 1) xs
 
@@ -96,22 +95,20 @@ replicate n x | n <= 0 = []
 interleave :: [Int] -> [Int] -> [Int]
 interleave [] _ = []
 interleave (x:_) [] = [x]
-interleave (x:xs) (y:ys) = x : y : interleave xs ys
-
+interleave (x:xs) ys = x : interleave ys xs
 
 sum :: [Int] -> Int
 sum [] = 0
 sum (x:xs) = x + sum xs
 
 
-maxHelper :: Int -> [Int] -> Int
-maxHelper acc [] = acc
-maxHelper acc (x:xs) | acc < x = maxHelper x xs
-                     | otherwise = maxHelper acc xs
-
 maximum :: [Int] -> Int
 maximum [] = error "empty list"
-maximum (x:xs) = maxHelper x xs
+maximum (x:xs)
+    | null xs = x
+    | x > head xs = maximum (x : tail xs)
+    | otherwise = maximum xs
+
 
 nub :: [Int] -> [Int]
 nub [] = []
